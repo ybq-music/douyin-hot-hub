@@ -22,8 +22,19 @@ def latest_raw_dir():
 
 
 def load_json(path):
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with path.open("r", encoding="utf-8") as f:
+            text = f.read().strip()
+
+        if not text:
+            print(f"skip empty json: {path}")
+            return {}
+
+        return json.loads(text)
+
+    except json.JSONDecodeError:
+        print(f"skip invalid json: {path}")
+        return {}
 
 
 def find_list(value):
