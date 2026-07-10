@@ -4,18 +4,18 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "17 * * * *"
-      timezone: "Asia/Shanghai"
 
 permissions:
   contents: write
 
 concurrency:
-  group: douyin-rank-schedule
-  cancel-in-progress: false
+  group: douyin-rank-schedule-v2
+  cancel-in-progress: true
 
 jobs:
   collect:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     env:
       TZ: Asia/Shanghai
@@ -46,6 +46,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add README.md archives raw outputs
-          git diff --cached --quiet || git commit -m "auto update douyin ranks and xlsx"
-          git pull --rebase
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "auto update douyin ranks and xlsx"
+            git push
+          fi
